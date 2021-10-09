@@ -2,14 +2,15 @@
 import rospy
 from math import atan2, cos, pi, sin, sqrt
 import random
+import time
 # remember the Twist message from the prelab?
 # here we import it from geometry_msgs to gain
 # access to the data structure. 
 from geometry_msgs.msg import Twist
 
 # TODO: SET FORMULA CONSTANTS HERE
-ANGULAR_Z = random.randint(1, 10)
-V = random.randint(1, 10)
+ANGULAR_Z = random.randint(1, 1)
+V = random.randint(1, 1)
 
 # Define the DizzyTurtle class
 class DizzyTurtle():
@@ -42,22 +43,24 @@ class DizzyTurtle():
         # with the queue_size 10 defined in the publisher.
         rate = rospy.Rate(10)
         rospy.loginfo('Set Rate to 10hz')
+        # https://www.youtube.com/watch?v=4Lifb9Cg_9w : This Tutorial Helped Me A Lot
 
 	    #TODO: RECORD THE START TIME HERE FOR ELAPSED CALCULATION
-        self.CurrentTime = rospy.gettime()
+        self.CurrentTime = rospy.get_time()
         # We can run the main loop of the Node while we don't get a Ctrl+C input
 
         while not rospy.is_shutdown():
 	        # TODO: CALCULATE vx and vy WITH SPIRAL FORMULA
-            timeElasped = self.CurrentTime - rospy.gettime() - self.CurrentTime
-            print(timeElasped)
-            x_pos = get_x_pos(timeElasped)
-            y_pos get_y_pos(timeElasped)
+            timeElasped = rospy.get_time() - self.CurrentTime
+            #print(timeElasped)
+            x_pos = self.get_x_pos(timeElasped) * 0.1
+            y_pos = self.get_y_pos(timeElasped) * 0.1
+            print(x_pos, y_pos)
   
             # TODO: ASSIGN VALUES TO TWIST
             velocity_message.linear.x = x_pos
             velocity_message.linear.y = y_pos
-            velocity_message.angular.z = ANGULAR_Z
+            #velocity_message.angular.z = ANGULAR_Z  #This messes up the program
 
             # TODO: PUBLISH TWIST MESSAGE TO CMD_VEL WITH PUBLISHER HANDLE
             self.cmd_vel_pub.publish(velocity_message)
@@ -67,10 +70,10 @@ class DizzyTurtle():
 
     #Functions To Get the Positions
     def get_x_pos(self, timeElasped):
-        return (V * cos(ANGULAR_Z * timeElasped)) - ((ANGULAR_Z * V) * sin(ANGULAR_Z * timeElasped))
+        return (V * cos(ANGULAR_Z * timeElasped)) - ((ANGULAR_Z * V * timeElasped) * sin(ANGULAR_Z * timeElasped))
 
     def get_y_pos(self, timeElasped):
-        return (V * sin(ANGULAR_Z * timeElasped)) - ((ANGULAR_Z * V) * cos(ANGULAR_Z * timeElasped))
+        return (V * sin(ANGULAR_Z * timeElasped)) - ((ANGULAR_Z * V * timeElasped) * cos(ANGULAR_Z * timeElasped))
 
 
     # The shutdown method is called when the user inputs Ctrl+C
