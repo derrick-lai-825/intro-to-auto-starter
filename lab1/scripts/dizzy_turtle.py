@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 import rospy
 from math import atan2, cos, pi, sin, sqrt
+import random
 # remember the Twist message from the prelab?
 # here we import it from geometry_msgs to gain
 # access to the data structure. 
 from geometry_msgs.msg import Twist
 
 # TODO: SET FORMULA CONSTANTS HERE
-ANGULAR_Z = 0
-V = 0
+ANGULAR_Z = random.randint(1, 10)
+V = random.randint(1, 10)
 
 # Define the DizzyTurtle class
 class DizzyTurtle():
@@ -34,7 +35,7 @@ class DizzyTurtle():
         self.cmd_vel_pub = rospy.Publisher("/turtle1/cmd_vel", Twist, queue_size=10)
 
 	    #TODO: CREATE INSTANCE OF TWIST MESSAGE TYPE
-  
+        velocity_message = Twist()
 
         # we define a rate to recieve messages at per second. In other words,
         # our run rate is 10Hz. To be clear, this 10 has nothing to do 
@@ -43,17 +44,34 @@ class DizzyTurtle():
         rospy.loginfo('Set Rate to 10hz')
 
 	    #TODO: RECORD THE START TIME HERE FOR ELAPSED CALCULATION
-
+        self.CurrentTime = rospy.gettime()
         # We can run the main loop of the Node while we don't get a Ctrl+C input
+
         while not rospy.is_shutdown():
 	        # TODO: CALCULATE vx and vy WITH SPIRAL FORMULA
-
+            timeElasped = self.CurrentTime - rospy.gettime() - self.CurrentTime
+            print(timeElasped)
+            x_pos = get_x_pos(timeElasped)
+            y_pos get_y_pos(timeElasped)
+  
             # TODO: ASSIGN VALUES TO TWIST
-            
+            velocity_message.linear.x = x_pos
+            velocity_message.linear.y = y_pos
+            velocity_message.angular.z = ANGULAR_Z
+
             # TODO: PUBLISH TWIST MESSAGE TO CMD_VEL WITH PUBLISHER HANDLE
-            
+            self.cmd_vel_pub.publish(velocity_message)
+
             # sleep for 10Hz (0.1s) and loop again
             rate.sleep() 
+
+    #Functions To Get the Positions
+    def get_x_pos(self, timeElasped):
+        return (V * cos(ANGULAR_Z * timeElasped)) - ((ANGULAR_Z * V) * sin(ANGULAR_Z * timeElasped))
+
+    def get_y_pos(self, timeElasped):
+        return (V * sin(ANGULAR_Z * timeElasped)) - ((ANGULAR_Z * V) * cos(ANGULAR_Z * timeElasped))
+
 
     # The shutdown method is called when the user inputs Ctrl+C
     def shutdown(self):
