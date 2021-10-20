@@ -37,7 +37,8 @@ class DizzyTurtle():
 
 	    #TODO: CREATE INSTANCE OF TWIST MESSAGE TYPE
         velocity_message = Twist()
-
+        #What does this thing do? 
+        
         # we define a rate to recieve messages at per second. In other words,
         # our run rate is 10Hz. To be clear, this 10 has nothing to do 
         # with the queue_size 10 defined in the publisher.
